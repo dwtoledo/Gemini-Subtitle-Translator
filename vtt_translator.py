@@ -409,7 +409,15 @@ class TranslationService:
         for item in all_translated_items:
             original_item = subtitle_data_by_id.get(item['id'])
             if original_item:
-                translated_item = TranslatedItem(**item, start=original_item.start, end=original_item.end)
+                # Remover start/end se eles já existirem no item para evitar duplicação
+                item_data = {k: v for k, v in item.items() if k not in ['start', 'end']}
+                
+                # Adicionar start/end do original
+                item_data['start'] = original_item.start
+                item_data['end'] = original_item.end
+                
+                # Criar o objeto TranslatedItem
+                translated_item = TranslatedItem(**item_data)
                 final_translated_items.append(translated_item)
             else:
                 logger.warning(f"Translated ID {item['id']} not found in original data to add timestamp.")
